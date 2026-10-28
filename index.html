@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LifeGuard — Төтенше жағдай тренажері</title>
+<style>
+:root{--bg:#0b1424;--panel:#141d2e;--panel2:#1b2638;--line:#27344a;--tx:#eef2f8;--mut:#93a1b8;--red:#e5322d;--blue:#4a8fe7;--ok:#37b26c;--warn:#f0a93b;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:#0b1424ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:auto;padding:12px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;display:flex;gap:8px;align-items:center}.logo i{width:22px;height:22px;border-radius:6px;background:var(--red);display:grid;place-items:center;font-style:normal;font-size:15px}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}nav a{padding:6px 12px;border-radius:8px;color:var(--mut);font-size:14px}nav a.on,nav a:hover{background:var(--panel2);color:var(--tx)}
+main{max-width:1100px;margin:auto;padding:24px 16px 60px}
+h1{font-size:clamp(30px,6vw,54px);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}h2{margin:0 0 12px;font-size:26px}h3{margin:0 0 6px}
+p{margin:0 0 12px;color:var(--mut)}
+.btn{background:var(--red);color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:700;display:inline-block}.btn.sec{background:transparent;border:1px solid var(--line);color:var(--tx)}.btn.sm{padding:7px 12px;font-size:14px}
+.btn:hover{filter:brightness(1.1)}.btn[disabled]{opacity:.4;cursor:not-allowed}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center;padding:28px 0 40px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card.ill{padding:0;overflow:hidden}.card.ill .ic{height:110px;display:grid;place-items:center;font-size:46px;background:var(--panel2)}.card.ill .bd{padding:16px}
+.tag{display:inline-block;font-size:12px;padding:2px 10px;border-radius:20px;background:var(--panel2);color:var(--mut);margin:0 6px 8px 0}.tag.r{background:#e5322d26;color:#ff8a86}
+.stats{display:flex;gap:32px;flex-wrap:wrap;padding:24px 0;border-block:1px solid var(--line);margin:32px 0}.stats b{font-size:28px;display:block}.stats span{color:var(--mut);font-size:14px}
+footer{border-top:1px solid var(--line);padding:24px 16px;text-align:center;color:var(--mut);font-size:13px}
+.disc{border-left:3px solid var(--warn);background:#f0a93b14;padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;color:var(--tx);margin:16px 0}
+/* play */
+.play{display:grid;grid-template-columns:1fr 280px;gap:16px}@media(max-width:860px){.play{grid-template-columns:1fr}}
+.stage{background:#0e1727;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;touch-action:none}
+.stage svg{display:block;width:100%;height:auto}
+.alert{position:absolute;left:10px;right:10px;top:10px;background:#e5322dee;padding:8px 12px;border-radius:10px;font-weight:600;font-size:14px;pointer-events:none}
+.prompt{position:absolute;left:50%;bottom:12px;transform:translateX(-50%)}
+.hud{display:flex;flex-direction:column;gap:12px}
+.meter{height:8px;border-radius:6px;background:var(--panel2);overflow:hidden}.meter i{display:block;height:100%;background:var(--ok);transition:width .2s}
+.row{display:flex;justify-content:space-between;font-size:14px;gap:8px}
+.chk{font-size:14px;color:var(--mut);padding-left:0;list-style:none;margin:0}.chk li.d{color:var(--ok)}.chk li:before{content:"○ "}.chk li.d:before{content:"● "}
+.modal{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:20;padding:16px}.modal .card{max-width:460px;width:100%}
+.log{max-height:120px;overflow:auto;font-size:13px;color:var(--mut)}
+.dpad{display:none;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:6px;justify-content:center;margin-top:12px}.dpad button{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:14px;font-size:20px;touch-action:none}@media(pointer:coarse),(max-width:860px){.dpad{display:grid}}.q{margin-bottom:14px}.q button{display:block;width:100%;text-align:left;margin-top:6px;background:var(--panel2);border:1px solid var(--line);color:var(--tx);padding:10px 12px;border-radius:10px}.q button.ok{border-color:var(--ok)}.q button.no{border-color:var(--red)}select{background:var(--panel2);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px}.fl{animation:fl .5s infinite alternate}@keyframes fl{to{transform:scale(1.18) translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.fl{animation:none}}
+.res-ok{color:var(--ok)}.res-bad{color:#ff8a86}
+.big{font-size:64px;font-weight:800;line-height:1}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px}.bars div{flex:1;background:var(--blue);border-radius:4px 4px 0 0;min-height:4px;position:relative}.bars span{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:11px;color:var(--mut)}
+.badge{opacity:.35}.badge.on{opacity:1}
+ul.l{margin:0;padding-left:18px;color:var(--mut)}ul.l li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<header><div class="bar"><a class="logo" href="#home"><i>+</i>LifeGuard</a>
+<nav id="nav"><a href="#home">Басты бет</a><a href="#sims">Симуляциялар</a><a href="#ai">AI талдауы</a><a href="#dash">Кабинет</a><a href="#learn">Оқу орталығы</a></nav></div></header>
+<main id="app"></main>
+<footer>LifeGuard — оқу симуляциясы. Бұл ресми төтенше нұсқаулық емес. Нақты төтенше жағдайда 112 нөміріне қоңырау шалыңыз.</footer>
+<div id="modal"></div>
+<script>
+const $=s=>document.querySelector(s),app=$("#app");
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const SCEN=[
+{id:"fire",ic:"🔥",t:"Өрт кезіндегі қауіпсіздік",d:"Пәтерде ас үйден түтін шығып жатыр. Қауіпсіз эвакуацияны орындаңыз.",df:"Орташа",du:"3 мин",on:1},
+{id:"quake",ic:"🌐",t:"Жер сілкінісі",d:"Тербеліс кезінде қауіпсіз орынды таңдап, ғимараттан шығуды үйреніңіз.",df:"Орташа",du:"4 мин"},
+{id:"gas",ic:"💨",t:"Газдың ағуы",d:"Газ иісін сезгенде не істеуге болады және не істеуге болмайды.",df:"Қиын",du:"4 мин"},
+{id:"road",ic:"🚗",t:"Жол-көлік оқиғасы",d:"Апат орнында қауіпсіздікті сақтап, алғашқы көмек шақыру.",df:"Жеңіл",du:"3 мин"}];
+const LESS=[
+["Өрт: негізгі ережелер",["Дабыл қағыңыз, адамдарға хабарлаңыз.","Түтін болса еңкейіп немесе еңбектеп жүріңіз.","Лифтті пайдаланбаңыз, баспалдақпен түсіңіз.","Ас үй есігін жабу түтін мен отты баяулатады.","Қауіпсіз жерге шыққан соң 112-ге қоңырау шалыңыз."]],
+["Жер сілкінісі: қысқаша",["Үстел астына жасырыныңыз, басыңызды қорғаңыз.","Терезеден, ауыр шкафтардан аулақ болыңыз.","Тербеліс аяқталған соң баспалдақпен шығыңыз."]],
+["Газдың ағуы: қысқаша",["Ашық от жақпаңыз, ажыратқыштарды басмаңыз.","Терезелерді ашып, ғимараттан шығыңыз.","Қауіпсіз жерден газ қызметіне хабарлаңыз."]]];
+/* routing */
+const routes={home,sims,play,result,ai:result,dash,learn};
+function route(){const r=(location.hash||"#home").slice(1);stopLoop();closeModal();document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.hash==="#"+r||(r==="play"&&a.hash==="#sims")));(routes[r]||home)(r);scrollTo(0,0)}
+addEventListener("hashchange",route);
+function closeModal(){$("#modal").innerHTML=""}
+function home(){app.innerHTML=`<section class="hero"><div><h1>Төтенше жағдайға дайынсың ба?</h1><p style="font-size:18px">Қауіпті жағдайларда дұрыс әрекет етуді қауіпсіз виртуалды ортада үйрен.</p>
+<a class="btn" href="#play">Симуляцияны бастау</a> <a class="btn sec" href="#learn">Қалай жұмыс істейді?</a></div>
+<div class="card" style="padding:0;overflow:hidden">${scene(true)}</div></section>
+<div class="stats"><div><b>4</b><span>сценарий (1 ойнауға дайын)</span></div><div><b>0 ₸</b><span>демо-режим тегін</span></div><div><b>100%</b><span>браузерде жұмыс істейді</span></div></div>
+<h2>Мүмкіндіктер</h2><div class="grid">
+<div class="card"><h3>🎮 Интерактивті жаттығу</h3><p>Пәтердегі өртті өзіңіз басқарып, шешім қабылдайсыз. Әр таңдау жағдайды өзгертеді.</p></div>
+<div class="card"><h3>📋 Автоматты талдау</h3><p>Әрекеттеріңіз ережеге негізделген жүйемен тексеріліп, қателер түсіндіріледі.</p></div>
+<div class="card"><h3>📈 Прогресті бақылау</h3><p>Нәтижелер, орташа балл және жетістіктер кабинетте сақталады.</p></div></div>
+<h2 style="margin-top:32px">Сценарийлер</h2><div class="grid">${SCEN.map(card).join("")}</div>`}
+function card(s){return `<div class="card ill"><div class="ic">${s.ic}</div><div class="bd"><span class="tag">${s.df}</span><span class="tag">${s.du}</span><h3>${s.t}</h3><p>${s.d}</p>${s.on?'<a class="btn sm" href="#play">Бастау</a>':'<button class="btn sm sec" disabled>Жақында</button>'}</div></div>`}
+function sims(){app.innerHTML=`<h2>Симуляциялар</h2><p>Қазір өрт сценарийі толық ойнауға дайын. Қалғандары жақында қосылады.</p><div class="grid">${SCEN.map(card).join("")}</div>`}
+function learn(){app.innerHTML=`<h2>Оқу орталығы</h2><div class="disc">Бұл материалдар оқу симуляциясына арналған. Ресми төтенше нұсқаулықты ТЖМ (112) сайттарынан тексеріңіз.</div><div class="grid">${LESS.map(l=>`<div class="card"><h3>${l[0]}</h3><ul class="l">${l[1].map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("")}</div><h2 style="margin-top:32px">Қысқа викторина</h2><div id="quiz"></div>`;quiz()}
+const QZ=[["Өрт кезінде лифтті пайдалануға бола ма?",["Иә, ол жылдам","Жоқ, баспалдақпен түсу керек","Тек түтін аз болса"],1,"Лифт тоқтап қалуы немесе түтінге толуы мүмкін."],["Түтінді жерде қалай жүру керек?",["Тік тұрып жүгіру","Еңкейіп немесе еңбектеп","Тыныс алмай тік жүру"],1,"Ыстық түтін жоғарыда жиналады, төменде ауа тазарақ."],["Үлкен өрт кезіндегі басты басымдық?",["Өртті өзіңіз сөндіру","Заттарды жинау","Эвакуация және 112"],2,"Өмір — басты құндылық. Сөндіруді құтқарушыларға қалдырыңыз."],["Газ иісі сезілсе, нені істеуге болмайды?",["Терезені ашу","Жарық қосқышын басу","Ғимараттан шығу"],1,"Электр ұшқыны газдың жарылуына себеп болуы мүмкін."],["Қауіпсіз жерге шыққан соң бірінші не істейсіз?",["Үйге қайта кіру","112-ге қоңырау шалу","Ештеңе істемей күту"],1,"Құтқарушыларға мекенжай мен жағдайды хабарлаңыз."]];
+function quiz(){let sc=0,n=0;const el=$("#quiz");el.innerHTML=QZ.map((x,i)=>`<div class="card q"><b>${x[0]}</b>${x[1].map((o,j)=>`<button data-i="${i}" data-j="${j}">${o}</button>`).join("")}<p id="e${i}" style="margin:8px 0 0"></p></div>`).join("")+`<p id="qs" style="color:var(--tx);font-weight:700"></p>`;el.querySelectorAll("button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i,j=+b.dataset.j,q=QZ[i],bs=el.querySelectorAll(`button[data-i="${i}"]`);if(bs[0].disabled)return;bs.forEach(x=>x.disabled=true);bs[q[2]].classList.add("ok");if(j!==q[2])b.classList.add("no");else sc++;n++;$("#e"+i).textContent=q[3];if(n===QZ.length)$("#qs").textContent=`Нәтиже: ${sc}/${QZ.length}`})}
+/* scene */
+function scene(preview){return `<svg viewBox="0 0 600 400" ${preview?'':'id="svg"'} role="img" aria-label="Пәтер жоспары">
+<rect width="600" height="400" fill="#0e1727"/><rect x="20" y="20" width="360" height="360" fill="#1b2638"/><rect x="380" y="20" width="200" height="360" fill="#222c3f"/>
+<path d="M20 20H580V380H20Z M380 20V240M380 300V380" fill="none" stroke="#5b6b86" stroke-width="6"/>
+<rect x="14" y="270" width="12" height="60" fill="#4a8fe7"/><text x="34" y="262" fill="#93a1b8" font-size="12">Шығу</text>
+<rect x="60" y="150" width="110" height="50" rx="8" fill="#3a4a66"/><text x="82" y="180" fill="#93a1b8" font-size="12">Диван</text>
+<rect x="230" y="200" width="90" height="60" rx="6" fill="#33425c"/><text x="244" y="235" fill="#93a1b8" font-size="12">Үстел</text>
+<rect x="150" y="305" width="40" height="26" rx="3" fill="#6b7a96"/><text x="140" y="348" fill="#93a1b8" font-size="11">Ноутбук</text>
+<circle cx="200" cy="70" r="14" fill="#4a8fe7"/><text x="190" y="75" font-size="14">☎</text>
+<circle cx="90" cy="70" r="14" fill="#f0a93b"/><text x="82" y="76" font-size="15">🔔</text>
+<rect x="400" y="30" width="170" height="50" fill="#33425c"/><text x="440" y="60" fill="#93a1b8" font-size="12">Ас үй</text>
+<g class="fl" style="transform-origin:490px 160px"><ellipse cx="490" cy="150" rx="40" ry="55" fill="#e5322d"/><ellipse cx="490" cy="165" rx="24" ry="36" fill="#f0a93b"/></g>
+<rect id="smkL" x="20" y="20" width="360" height="360" fill="#6b7280" opacity="0"/><rect id="smkK" x="380" y="20" width="200" height="360" fill="#4b5260" opacity=".55"/>
+<line id="kdoor" x1="380" y1="240" x2="380" y2="300" stroke="#f0a93b" stroke-width="8" opacity="0"/>
+${preview?'':'<g id="pl"><circle r="14" fill="#fff"/><circle r="6" fill="#4a8fe7"/></g>'}</svg>`}
+/* game */
+let G=null,raf=0,keys={};
+const OBJ=[{id:"alarm",x:90,y:70,l:"Өрт дабылын қағу"},{id:"phone",x:200,y:70,l:"112-ге қоңырау шалу"},{id:"close",x:370,y:270,l:"Ас үй есігін жабу"},{id:"laptop",x:170,y:318,l:"Ноутбукті алу"},{id:"extg",x:430,y:200,l:"Өртті сөндіруге тырысу"},{id:"exit",x:34,y:300,l:"Пәтерден шығу"}];
+function stopLoop(){cancelAnimationFrame(raf);raf=0;G&&(G.run=false);removeEventListener("keydown",kd);removeEventListener("keyup",ku)}
+function play(){
+const df=store.get("lg_diff",1);G={dm:[.6,1,1.6][df],lim:[150,120,90][df],df,t:0,hp:100,smoke:0,crouch:false,x:250,y:250,tx:null,ty:null,acts:[],done:{},paused:false,run:true,closed:false,muted:false,msg:"Назар аударыңыз! Ас үйден түтін шығып жатыр."};
+app.innerHTML=`<div class="play"><div><div class="stage" id="stage">${scene()}<div class="alert" id="alert"></div><div class="prompt" id="prompt"></div></div>
+<p style="margin-top:10px;font-size:14px">Жүру: WASD / көрсеткілер немесе сахнаны түртіңіз. Әрекет: E немесе түймені басыңыз. Еңкею: C.</p>
+<div class="dpad"><span></span><button data-k="w" aria-label="Жоғары">▲</button><span></span><button data-k="a" aria-label="Солға">◀</button><button id="dc" aria-label="Еңкею">🧎</button><button data-k="d" aria-label="Оңға">▶</button><span></span><button data-k="s" aria-label="Төмен">▼</button><span></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><select id="df" aria-label="Қиындық деңгейі"><option value="0">Жеңіл</option><option value="1">Орташа</option><option value="2">Қиын</option></select><button class="btn sm sec" id="bP">⏸ Кідірту</button><button class="btn sm sec" id="bR">↻ Қайта бастау</button><button class="btn sm sec" id="bC">🧎 Еңкею: өшірулі</button><button class="btn sm sec" id="bS">🔊 Дыбыс</button></div></div>
+<aside class="hud"><div class="card"><h3>Ағымдағы міндет</h3><p id="obj" style="color:var(--tx);margin:0"></p></div>
+<div class="card"><div class="row"><span>Уақыт</span><b id="tm">0:00</b></div><div class="row" style="margin-top:8px"><span>Денсаулық</span><b id="hpv">100</b></div><div class="meter"><i id="hpb"></i></div>
+<div class="row" style="margin-top:8px"><span>Түтін деңгейі</span><b id="smv">0%</b></div><div class="meter"><i id="smb" style="background:var(--warn)"></i></div></div>
+<div class="card"><h3>Прогресс</h3><ul class="chk" id="chk"></ul></div><div class="card"><h3>Әрекеттер журналы</h3><div class="log" id="log"></div></div></aside></div>`;
+$("#bP").onclick=()=>{G.paused=!G.paused;$("#bP").textContent=G.paused?"▶ Жалғастыру":"⏸ Кідірту"};
+$("#bR").onclick=play;document.querySelectorAll(".dpad [data-k]").forEach(b=>{const k=b.dataset.k;b.onpointerdown=e=>{e.preventDefault();keys[k]=1;G.tx=null};["pointerup","pointerleave","pointercancel"].forEach(ev=>b["on"+ev]=()=>{keys[k]=0})});$("#dc").onclick=toggleCrouch;$("#df").value=G.df;$("#df").onchange=e=>{store.set("lg_diff",+e.target.value);play()};$("#bC").onclick=toggleCrouch;$("#bS").onclick=()=>{G.muted=!G.muted;$("#bS").textContent=G.muted?"🔇 Дыбыс өшірулі":"🔊 Дыбыс"};
+$("#svg").addEventListener("pointerdown",e=>{const sv=$("#svg"),r=sv.getBoundingClientRect();G.tx=(e.clientX-r.left)/r.width*600;G.ty=(e.clientY-r.top)/r.height*400});
+addEventListener("keydown",kd);addEventListener("keyup",ku);beep(440);last=performance.now();raf=requestAnimationFrame(tick)}
+let last=0,ac=null;
+function beep(f){if(!G||G.muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.15)}catch(e){}}
+function kd(e){const k=e.key.toLowerCase();keys[k]=1;if(k==="e")doNear();if(k==="c")toggleCrouch();if(k.startsWith("arrow"))e.preventDefault()}
+function ku(e){keys[e.key.toLowerCase()]=0}
+function toggleCrouch(){if(!G||G.over)return;G.crouch=!G.crouch;if(G.crouch)G.done.crouch=1;$("#bC").textContent="🧎 Еңкею: "+(G.crouch?"қосулы":"өшірулі")}
+function near(){let b=null,bd=55;for(const o of OBJ){if(o.id==="close"&&G.closed)continue;const d=Math.hypot(o.x-G.x,o.y-G.y);if(d<bd){bd=d;b=o}}return b}
+function rec(id,ok,txt){G.acts.push({t:Math.round(G.t),id,ok,txt});const l=$("#log");if(l)l.innerHTML=`<div>${ok?"✅":"⚠️"} ${txt}</div>`+l.innerHTML}
+function say(m){G.msg=m}
+function doNear(){if(!G||G.paused||G.over)return;const o=near();if(!o)return;const D=G.done;
+switch(o.id){
+case"alarm":if(D.alarm)return say("Дабыл қағылды.");D.alarm=1;rec("alarm",1,"Дабыл қақтыңыз");say("Дабыл қағылды. Көршілер хабардар.");break;
+case"phone":if(D.call)return say("112 шақырылды.");D.call=1;D.callAt=G.smoke>.6?"late":"ok";rec("call",1,"112-ге қоңырау шалдыңыз");say("112 шақырылды. Мекенжайды айттыңыз.");break;
+case"close":G.closed=true;D.close=1;rec("close",1,"Ас үй есігін жаптыңыз");say("Есік жабылды: түтін баяу таралады.");break;
+case"laptop":D.laptop=(D.laptop||0)+1;G.t+=8;G.smoke+=.08;rec("laptop",0,"Заттарды алуға уақыт жоғалттыңыз");say("Заттарға 8 секунд кетті. Өмір заттан қымбат!");beep(200);break;
+case"extg":D.fight=(D.fight||0)+1;G.hp-=25;G.smoke+=.1;rec("fight",0,"Өртті өзіңіз сөндіруге тырыстыңыз");say("Өрт күшейді! Түтін жұтып, зардап шектіңіз.");beep(150);break;
+case"exit":finishExit();break}}
+function finishExit(){G.paused=true;const D=G.done;
+$("#modal").innerHTML=`<div class="modal"><div class="card"><h3>Сіз есікке жеттіңіз</h3><p>Баспалдақ алаңына шықтыңыз. Енді қалай түсесіз?</p><div style="display:grid;gap:8px">
+<button class="btn" id="m1">Баспалдақпен түсу</button><button class="btn sec" id="m2">Лифтпен түсу</button>${D.call?"":'<button class="btn sec" id="m3">Алдымен сыртта 112-ге қоңырау шалу</button>'}</div></div></div>`;
+$("#m1").onclick=()=>{D.stairs=1;rec("stairs",1,"Баспалдақпен түстіңіз");end(true)};
+$("#m2").onclick=()=>{D.lift=1;rec("lift",0,"Лифтті пайдаландыңыз");end(true)};
+const m3=$("#m3");if(m3)m3.onclick=()=>{D.call=1;D.callAt="outside";rec("call",1,"Қауіпсіз жерден 112-ге қоңырау шалдыңыз");m3.remove()}}
+function tick(n){if(!G||!G.run)return;const dt=Math.min(.05,(n-last)/1000);last=n;
+if(!G.paused&&!G.over){G.t+=dt;const rate=(G.closed?.006:.014)*G.dm;G.smoke=Math.min(1,G.smoke+rate*dt*(1+(G.t>60?.5:0)));
+let dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);
+if(dx||dy){G.tx=null}else if(G.tx!=null){const vx=G.tx-G.x,vy=G.ty-G.y,d=Math.hypot(vx,vy);if(d>4){dx=vx/d;dy=vy/d}else G.tx=null}
+const sp=(G.crouch?60:110)*dt,l=Math.hypot(dx,dy)||1,nx=G.x+dx/l*sp*(dx||dy?1:0),ny=G.y+dy/l*sp*(dx||dy?1:0);
+let px=Math.max(32,Math.min(568,nx)),py=Math.max(32,Math.min(368,ny));
+if((G.x<380&&px>=380)||(G.x>=380&&px<380)){if(G.closed||py<240||py>300)px=G.x<380?379:381}
+G.x=px;G.y=py;
+const k=G.x>=380;let dmg=0;if(k)dmg=8;else if(G.smoke>.3)dmg=G.crouch?G.smoke*1.2:G.smoke*5;
+G.hp-=dmg*dt;if(dmg>0&&G.crouch===false&&G.smoke>.3)G.done.smokeNoCrouch=1;if(dmg>0&&G.crouch)G.done.smokeCrouch=1;
+if(k&&!G.done.kit){G.done.kit=1;rec("kit",0,"Түтінді ас үйге кірдіңіз")}
+if(G.hp<=0){G.hp=0;end(false,"Денсаулығыңыз таусылды.")}else if(G.t>=G.lim)end(false,"Уақыт бітті: өрт таралды.")}
+draw();raf=requestAnimationFrame(tick)}
+function draw(){const p=$("#pl");if(!p)return;const D=G.done;p.setAttribute("transform",`translate(${G.x} ${G.y})`);p.firstChild.setAttribute("r",G.crouch?10:14);
+$("#smkL").setAttribute("opacity",G.smoke*.6);$("#kdoor").setAttribute("opacity",G.closed?1:0);
+const m=Math.floor(G.t/60),s=Math.floor(G.t%60);$("#tm").textContent=m+":"+String(s).padStart(2,"0");
+$("#hpv").textContent=Math.round(G.hp);const hb=$("#hpb");hb.style.width=G.hp+"%";hb.style.background=G.hp<35?"var(--red)":"var(--ok)";
+$("#smv").textContent=Math.round(G.smoke*100)+"%";$("#smb").style.width=G.smoke*100+"%";
+$("#alert").textContent="⚠ "+G.msg;const o=near();$("#prompt").innerHTML=o?`<button class="btn" onclick="doNear()">E · ${o.l}</button>`:"";
+const obj=!D.call&&!D.alarm?"Дабыл қағып, 112-ге қоңырау шалыңыз, содан кейін шығуға бағыттаңыз.":D.call&&D.alarm&&!D.close?"Мүмкін болса, ас үй есігін жабыңыз.":"Түтіннен еңкейіп өтіп, шығу есігіне жетіңіз.";
+$("#obj").textContent=obj;
+const c=[["Дабыл қағу",D.alarm],["112-ге хабарлау",D.call],["Ас үй есігін жабу",D.close],["Түтінде еңкею",D.crouch],["Шығу есігіне жету",D.stairs||D.lift]];
+$("#chk").innerHTML=c.map(x=>`<li class="${x[1]?"d":""}">${x[0]}</li>`).join("")}
+/* scoring + feedback (deterministic, rule based) */
+function evaluate(win,why){const D=G.done,good=[],bad=[];let sc=0;
+if(D.alarm){sc+=15;good.push("Дабыл қақтыңыз: айналадағы адамдар хабардар болды.")}else bad.push(["Дабыл қағылмады","Көршілер мен отбасыңыз қауіптен кеш хабардар болады. Алдымен дабыл қағыңыз."]);
+if(D.call){sc+=D.callAt==="outside"?10:20;good.push("112-ге хабарладыңыз.");if(D.callAt==="outside")good.push("Қоңырау қауіпсіз жерден шалынды — бұл да дұрыс.")}else bad.push(["112-ге қоңырау шалынбады","Құтқарушылар мекенжайды білмесе, көмек кешігеді."]);
+if(D.close){sc+=15;good.push("Ас үй есігін жауып, түтіннің таралуын баяулаттыңыз.")}else bad.push(["Ас үй есігі ашық қалды","Жабық есік түтін мен оттың таралуын баяулатады, егер ол сізді қауіпке қоймаса."]);
+if(D.smokeCrouch)sc+=10,good.push("Түтінде еңкейіп жүрдіңіз: түтін төменде аз болады.");
+if(D.smokeNoCrouch)bad.push(["Түтінде тік жүрдіңіз","Ыстық түтін жоғары жиналады. Еңкейіп немесе еңбектеп жүріңіз."]);
+if(D.kit)bad.push(["Түтінді ас үйге кірдіңіз","Жану ошағына жақындау өте қауіпті. Әрқашан қарама-қарсы бағытта шығыңыз."]);
+if(D.fight)sc-=25,bad.push(["Өртті өзіңіз сөндіруге тырыстыңыз","Үлкен өртті сөндіру қауіпті. Эвакуация мен 112 — басты басымдық."]);
+if(D.laptop)sc-=15,bad.push(["Заттарды алуға уақыт жоғалттыңыз","Әр секунд маңызды. Заттарды тастап шығыңыз."]);
+if(D.stairs){sc+=30;good.push("Баспалдақпен түстіңіз: өрт кезінде бұл дұрыс таңдау.")}
+if(D.lift){sc-=20;bad.push(["Лифтті таңдадыңыз","Лифт өрт кезінде тоқтап қалуы немесе түтінге толуы мүмкін. Тек баспалдақ."])}
+sc+=Math.round(G.hp/10);sc=Math.max(0,Math.min(100,sc));
+if(!win)sc=Math.min(sc,30);if(D.lift)sc=Math.min(sc,50);if(D.fight)sc=Math.min(sc,60);
+if(win&&!bad.length)good.push("Қауіпсіз эвакуация қатесіз орындалды.");
+const rec=[];if(bad.length)rec.push("Оқу орталығындағы «Өрт: негізгі ережелер» бөлімін қайталаңыз.");if(D.fight||D.laptop)rec.push("Жаттығуды қайталап, тек эвакуацияға назар аударыңыз.");if(!bad.length)rec.push("Тамаша! Жақында қосылатын «Газдың ағуы» сценарийіне дайындалыңыз.");
+return{df:G.df,ts:Date.now(),score:sc,win,why:why||"",time:Math.round(G.t),hp:Math.round(G.hp),good,bad,rec,acts:G.acts,next:bad.length?"Өрт кезіндегі қауіпсіздік (қайта)":"Газдың ағуы (жақында)"}}
+function end(win,why){if(G.over)return;G.over=true;const r=evaluate(win,why);const all=store.get("lg_sessions",[]);all.push(r);store.set("lg_sessions",all);location.hash="#result"}
+function result(){const all=store.get("lg_sessions",[]),r=all[all.length-1];
+if(!r){app.innerHTML=`<h2>AI талдауы</h2><div class="card"><p>Әзірге талдау жоқ. Алдымен симуляцияны өтіңіз.</p><a class="btn" href="#play">Симуляцияны бастау</a></div>`;return}
+const mm=Math.floor(r.time/60)+":"+String(r.time%60).padStart(2,"0");
+app.innerHTML=`<h2>${r.win?"Сценарий аяқталды":"Сценарий сәтсіз аяқталды"}</h2>${r.why?`<p class="res-bad">${r.why}</p>`:""}
+<div class="disc">Бұл — автоматты талдау (ережеге негізделген жүйе). Нақты жасанды интеллект қосылған жоқ.</div>
+<div class="grid"><div class="card"><p>Жалпы балл</p><div class="big">${r.score}</div><p style="margin-top:8px">Уақыт: ${mm} · Денсаулық: ${r.hp}%</p></div>
+<div class="card"><h3 class="res-ok">Дұрыс шешімдер</h3><ul class="l">${r.good.map(x=>`<li>${x}</li>`).join("")||"<li>Жоқ</li>"}</ul></div>
+<div class="card"><h3 class="res-bad">Қателер</h3><ul class="l">${r.bad.map(x=>`<li><b style="color:var(--tx)">${x[0]}.</b> ${x[1]}</li>`).join("")||"<li>Қате жоқ</li>"}</ul></div>
+<div class="card"><h3>Ұсыныстар</h3><ul class="l">${r.rec.map(x=>`<li>${x}</li>`).join("")}</ul><p>Келесі жаттығу: <b style="color:var(--tx)">${r.next}</b></p></div></div>
+<p style="margin-top:16px"><a class="btn" href="#play">Қайта ойнау</a> <a class="btn sec" href="#dash">Кабинет</a></p>`}
+function dash(){let all=store.get("lg_sessions",[]);const demo=store.get("lg_demo",false);
+const sample=[62,71,55,84,90].map((s,i)=>({ts:Date.now()-(5-i)*864e5,score:s,time:70+i*5,win:true,demo:1}));
+const L=demo?sample.concat(all):all;
+const avg=L.length?Math.round(L.reduce((a,b)=>a+b.score,0)/L.length):0,best=L.length?Math.max(...L.map(x=>x.score)):0,tt=L.reduce((a,b)=>a+b.time,0);
+const B=[["🏁","Алғашқы өту",L.length>0],["⭐","80+ балл",best>=80],["🛡","Қатесіз",L.some(x=>x.bad&&!x.bad.length&&x.win)],["🔁","3 жаттығу",L.length>=3]];
+app.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h2>Жеке кабинет</h2><label style="font-size:14px;color:var(--mut)"><input type="checkbox" id="dm" ${demo?"checked":""}> Демо-деректер</label></div>
+${L.length?`<div class="grid"><div class="card"><p>Өтілген</p><div class="big">${L.length}</div></div><div class="card"><p>Орташа балл</p><div class="big">${avg}</div></div><div class="card"><p>Үздік нәтиже</p><div class="big">${best}</div></div><div class="card"><p>Жалпы уақыт</p><div class="big">${Math.round(tt/60)}<span style="font-size:20px"> мин</span></div></div></div>
+<div class="card" style="margin-top:16px"><h3>Прогресс</h3><div class="bars" style="margin-top:24px">${L.slice(-10).map(x=>`<div style="height:${x.score}%"><span>${x.score}</span></div>`).join("")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Жетістіктер</h3><div style="display:flex;gap:16px;flex-wrap:wrap">${B.map(b=>`<div class="badge ${b[2]?"on":""}">${b[0]} ${b[1]}</div>`).join("")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Соңғы әрекеттер</h3><ul class="l">${L.slice(-5).reverse().map(x=>`<li>${new Date(x.ts).toLocaleDateString("kk-KZ")} — Өрт сценарийі: ${x.score} балл</li>`).join("")}</ul></div>
+<div class="card" style="margin-top:16px"><h3>Ұсынылған сценарий</h3><p>Өрт кезіндегі қауіпсіздікті қайталаңыз.</p><a class="btn sm" href="#play">Бастау</a></div>`
+:`<div class="card"><h3>Әзірге нәтиже жоқ</h3><p>Алғашқы симуляцияны өтіп, статистиканы көріңіз.</p><a class="btn" href="#play">Симуляцияны бастау</a></div>`}`;
+$("#dm").onchange=e=>{store.set("lg_demo",e.target.checked);dash()}}
+route();
+</script>
+</body>
+</html>
